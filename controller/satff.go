@@ -121,7 +121,7 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 	}
 
 	customer, err := c.R.FindUserById(int(input.CustomerID))
-	if err != nil {
+	if err != nil || customer.ID < 1 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "customer not found",
 		})

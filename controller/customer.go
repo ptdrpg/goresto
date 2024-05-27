@@ -13,7 +13,7 @@ func (c *Controller) FindAllUsers(ctx *gin.Context) {
 	users, err := c.R.FindAllUsers()
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -26,8 +26,8 @@ func (c *Controller) FindAllUsers(ctx *gin.Context) {
 }
 
 func (c *Controller) FindUserById(ctx *gin.Context) {
-	userId := ctx.Param("id")
-	id, err := strconv.Atoi(userId)
+	customerId := ctx.Param("id")
+	id, err := strconv.Atoi(customerId)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -114,7 +114,13 @@ func (c *Controller) DeleteUser(ctx *gin.Context) {
 		log.Fatal(errConv.Error())
 	}
 
-	c.R.DeleteUser(userId)
+	deleting := c.R.DeleteUser(userId)
+	if deleting != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": deleting.Error(),
+		})
+		return
+	}
 
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusOK, gin.H{

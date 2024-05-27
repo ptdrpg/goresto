@@ -38,6 +38,7 @@ func DBconnexion() {
 	db.AutoMigrate(
 		&entity.Customer{},
 		&entity.Staff{},
+		&entity.Employee{},
 	)
 	DB = db
 }
