@@ -6,14 +6,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ptdrpg/resto/entity"
+	"github.com/ptdrpg/resto/lib"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type StaffResponse struct {
-	ID       uint            `gorm:"primary_key" json:"id"`
-	Customer entity.Customer `json:"customer"`
-	Username string          `json:"username"`
-	Password string          `json:"password"`
+	ID           uint            `gorm:"primary_key" json:"id"`
+	Customer     entity.Customer `json:"customer"`
+	Username     string          `json:"username"`
+	Password     string          `json:"password"`
+}
+
+type CreateStaffResponse struct {
+	ID           uint            `gorm:"primary_key" json:"id"`
+	Customer     entity.Customer `json:"customer"`
+	Username     string          `json:"username"`
+	Password     string          `json:"password"`
+	Token        string          `json:"token"`
+	RefreshToken string          `json:"refresh_token"`
 }
 
 func (c *Controller) FindAllStaff(ctx *gin.Context) {
@@ -97,7 +107,7 @@ type StaffCreateInput struct {
 }
 
 type StaffUpdateInput struct {
-	CustomerID int   `json:"customer_id"`
+	CustomerID int    `json:"customer_id"`
 	Username   string `json:"username"`
 }
 
@@ -111,16 +121,12 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 	}
 
 	customer, err := c.R.FindUserById(int(input.CustomerID))
-	if err != nil{
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "customer not found",
 		})
 		return
 	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": input,
-	})	
 
 	password := input.Password
 	hashedPass, pasErr := bcrypt.GenerateFromPassword([]byte(password), 10)
@@ -138,20 +144,42 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 		Password:   string(hashedPass),
 	}
 
-	var staffRes StaffResponse
+	generateToken, genTokErr := lib.GenerateToken(input.Username)
+	if genTokErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"messgae": genTokErr.Error(),
+		})
+		return
+	}
+
+	generateRefreshToken, genRefreshError := lib.GenerateRefreshToken(input.Username)
+	if genRefreshError != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": genRefreshError.Error(),
+		})
+		return
+	}
+
+	var staffRes CreateStaffResponse
 	staffRes.ID = staff.ID
 	staffRes.Username = staff.Username
 	staffRes.Password = staff.Password
 	staffRes.Customer = customer
+	staffRes.Token = generateToken
+	staffRes.RefreshToken = generateRefreshToken
 
-	ctx.Header("content-Type", "application/json")
 	err = c.R.CreateStaff(&staff)
 	if err != nil {
-		ctx.JSON(http.StatusCreated, gin.H{
-			"message": "succefuly created",
-			"data":    staffRes,
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
 		})
+		return
 	}
+	ctx.Header("content-Type", "application/json")
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "staff succefuly",
+		"data": staffRes,
+	})
 }
 
 func (c *Controller) UpdateStaff(ctx *gin.Context) {
@@ -182,13 +210,11 @@ func (c *Controller) UpdateStaff(ctx *gin.Context) {
 		return
 	}
 
-	
-
 	staff = entity.Staff{
 		ID:         staffTemp.ID,
 		CustomerID: input.CustomerID,
 		Username:   input.Username,
-		Password: staffTemp.Password,
+		Password:   staffTemp.Password,
 	}
 	c.R.UpdateStaff(&staff)
 

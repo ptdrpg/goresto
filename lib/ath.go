@@ -27,16 +27,17 @@ func GenerateToken(username string) (string, error) {
 	if err != nil {
 		log.Fatal("error loading .env file", err)
 	}
-	jwtkey := os.Getenv("SECRET_KEY")
+	jwtkey := []byte(os.Getenv("SECRET_KEY"))
 	validity := time.Now().Add(5 * time.Minute)
 	claims := &AccesClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: validity.Unix(),
+			Issuer: "test",
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtkey)
 }
 
@@ -45,15 +46,16 @@ func GenerateRefreshToken(username string) (string, error) {
 	if err != nil {
 		log.Fatal("error loading .env file", err)
 	}
-	refreshkey := os.Getenv("SECRET_KEY")
+	refreshkey := []byte(os.Getenv("SECRET_KEY"))
 	validity := time.Now().Add(24 * time.Hour)
-	claims := &RefreshClaims{
+	claims := &AccesClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: validity.Unix(),
+			Issuer: "test",
 		},
 	}
 
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return refreshToken.SignedString(refreshkey)
 }
