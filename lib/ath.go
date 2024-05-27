@@ -47,7 +47,7 @@ func GenerateRefreshToken(username string) (string, error) {
 		log.Fatal("error loading .env file", err)
 	}
 	refreshkey := []byte(os.Getenv("SECRET_KEY"))
-	validity := time.Now().Add(24 * time.Hour)
+	validity := time.Now().Add(24 * time.Hour).Add(5 * time.Minute)
 	claims := &AccesClaims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{

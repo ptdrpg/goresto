@@ -35,4 +35,5 @@ func (r *Router) RegisterRouter() {
 	sb.PUT("/update/:id", r.C.UpdateStaff)
 	sb.DELETE("/delete/:id", r.C.DeleteStaff)
 	sb.PUT("/update-pass/:id", r.C.UpdatePassword)
+	sb.POST("/login", r.C.Login)
 }

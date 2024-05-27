@@ -57,3 +57,13 @@ func (r *Repository) UpdatePassword(pass *entity.Staff) error {
 
 	return nil
 }
+
+func (r *Repository) Login(id int) (entity.Staff, error) {
+	var findStaff entity.Staff
+	result := r.DB.Find(&findStaff, id)
+	if result != nil {
+		return findStaff, nil
+	} else {
+		return findStaff, errors.New("staff not found")
+	}
+}

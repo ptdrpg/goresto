@@ -11,10 +11,10 @@ import (
 )
 
 type StaffResponse struct {
-	ID           uint            `gorm:"primary_key" json:"id"`
-	Customer     entity.Customer `json:"customer"`
-	Username     string          `json:"username"`
-	Password     string          `json:"password"`
+	ID       uint            `gorm:"primary_key" json:"id"`
+	Customer entity.Customer `json:"customer"`
+	Username string          `json:"username"`
+	Password string          `json:"password"`
 }
 
 type CreateStaffResponse struct {
@@ -178,7 +178,7 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusCreated, gin.H{
 		"message": "staff succefuly",
-		"data": staffRes,
+		"data":    staffRes,
 	})
 }
 
