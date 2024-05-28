@@ -115,7 +115,7 @@ func (c *Controller) CreateEmployee(ctx *gin.Context) {
 
 func (c *Controller) UpdateEmployee(ctx *gin.Context) {
 	var employe entity.Employee
-	err := ctx.ShouldBindJSON(employe)
+	err := ctx.ShouldBindJSON(&employe)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -140,6 +140,12 @@ func (c *Controller) UpdateEmployee(ctx *gin.Context) {
 		return
 	}
 	employe.ID = employetemp.ID
+	if employe.Hire_date == "" {
+		employe.Hire_date = employetemp.Hire_date
+	}
+	if employe.Job == "" {
+		employe.Job = employetemp.Job
+	}
 	updating := c.R.UpdateEmployee(&employe)
 	if updating != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
