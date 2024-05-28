@@ -43,4 +43,11 @@ func (r *Router) RegisterRouter() {
 	eb.POST("/create", r.C.CreateEmployee)
 	eb.PATCH("/update/:id", r.C.UpdateEmployee)
 	eb.DELETE("/delete/:id", r.C.DeleteEmployee)
+
+	ib := v1.Group("/items")
+	ib.GET("/get-all", r.C.FindAllItems)
+	ib.GET("/:id", r.C.FindItemById)
+	ib.POST("/create", r.C.CreateItems)
+	ib.PATCH("/update/:id", r.C.UpdateItems)
+	ib.DELETE("/delete/:id", r.C.DeleteItems)
 }

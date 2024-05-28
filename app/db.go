@@ -39,6 +39,7 @@ func DBconnexion() {
 		&entity.Customer{},
 		&entity.Staff{},
 		&entity.Employee{},
+		&entity.Items{},
 	)
 	DB = db
 }

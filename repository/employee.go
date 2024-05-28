@@ -21,7 +21,7 @@ func (r *Repository) FindEmployeeById(id int) (entity.Employee, error) {
 	if result != nil {
 		return findEmployee, nil
 	} else {
-		return findEmployee, errors.New("staff not found")
+		return findEmployee, errors.New("employee not found")
 	}
 }
 
