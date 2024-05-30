@@ -6,17 +6,17 @@ import (
 	"github.com/ptdrpg/resto/entity"
 )
 
-func (r *Repository) FindAllItems() ([]entity.Items, error) {
-	var items []entity.Items
-	if err := r.DB.Model(&entity.Items{}).Find(&items).Error;err != nil {
-		return []entity.Items{}, nil
+func (r *Repository) FindAllItems() ([]entity.Item, error) {
+	var items []entity.Item
+	if err := r.DB.Model(&entity.Item{}).Find(&items).Error; err != nil {
+		return []entity.Item{}, nil
 	}
 
 	return items, nil
 }
 
-func (r *Repository) FindItemById(id int) (entity.Items, error) {
-	var item entity.Items
+func (r *Repository) FindItemById(id int) (entity.Item, error) {
+	var item entity.Item
 	result := r.DB.Find(&item, id)
 	if result != nil {
 		return item, nil
@@ -25,7 +25,7 @@ func (r *Repository) FindItemById(id int) (entity.Items, error) {
 	}
 }
 
-func (r *Repository) CreateItems(item *entity.Items) (error) {
+func (r *Repository) CreateItems(item *entity.Item) error {
 	err := r.DB.Create(item)
 	if err != nil {
 		return err.Error
@@ -34,7 +34,7 @@ func (r *Repository) CreateItems(item *entity.Items) (error) {
 	return nil
 }
 
-func (r *Repository) UpdateItems(item *entity.Items) (error) {
+func (r *Repository) UpdateItems(item *entity.Item) error {
 	err := r.DB.Model(item).Updates(item)
 	if err != nil {
 		return err.Error
@@ -44,7 +44,7 @@ func (r *Repository) UpdateItems(item *entity.Items) (error) {
 }
 
 func (r *Repository) DeleteItems(id int) error {
-	var item entity.Items
+	var item entity.Item
 	if err := r.DB.Where("id = ?", id).Delete(&item).Error; err != nil {
 		return err
 	}

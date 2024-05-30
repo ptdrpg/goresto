@@ -41,6 +41,7 @@ func (u *Repository) UpdateUser(updateUserDto *entity.Customer) {
 		Gender:       updateUserDto.Gender,
 		ID:           updateUserDto.ID,
 		Address:      updateUserDto.Address,
+		Point:        updateUserDto.Point,
 	}
 	u.DB.Model(updateUserDto).Updates(updateUser)
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/ptdrpg/resto/entity"
 )
 
-
 func (c *Controller) FindAllItems(ctx *gin.Context) {
 	items, err := c.R.FindAllItems()
 	if err != nil {
@@ -49,7 +48,7 @@ func (c *Controller) FindItemById(ctx *gin.Context) {
 }
 
 func (c *Controller) CreateItems(ctx *gin.Context) {
-	var item entity.Items
+	var item entity.Item
 	err := ctx.ShouldBindJSON(&item)
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{
@@ -73,7 +72,7 @@ func (c *Controller) CreateItems(ctx *gin.Context) {
 }
 
 func (c *Controller) UpdateItems(ctx *gin.Context) {
-	var item entity.Items
+	var item entity.Item
 	err := ctx.ShouldBindJSON(&item)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
