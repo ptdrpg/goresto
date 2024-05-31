@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"bytes"
+	"image/png"
 	"net/http"
 	"strconv"
 
@@ -142,5 +144,72 @@ func (c *Controller) DeleteItems(ctx *gin.Context) {
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "item succefuly deleted",
+	})
+}
+
+func (c *Controller) UploadImage(ctx *gin.Context) {
+	picture, err := ctx.FormFile("picture")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	file, fileErr := picture.Open()
+	if fileErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": fileErr.Error(),
+		})
+		return
+	}
+	defer file.Close()
+
+	img, imgerr := png.Decode(file)
+	if imgerr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": imgerr.Error(),
+		})
+		return
+	}
+
+	buffer := new(bytes.Buffer)
+	bufferErr := png.Encode(buffer, img)
+	if bufferErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": bufferErr.Error(),
+		})
+		return
+	}
+
+	itemID := ctx.Param("id")
+	id, convertID := strconv.Atoi(itemID)
+	if convertID != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": convertID.Error(),
+		})
+		return
+	}
+
+	item, findItemErr := c.R.FindItemById(id)
+	if findItemErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": findItemErr.Error(),
+		})
+		return
+	}
+
+	item.Picture = buffer.Bytes()
+	updateItem := c.R.UpdateItems(&item)
+	if updateItem != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": updateItem.Error(),
+		})
+		return
+	}
+
+	ctx.Header("content-Type", "application/json")
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": item,
 	})
 }
