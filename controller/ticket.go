@@ -16,13 +16,13 @@ type ItemCount struct {
 }
 
 type TicketRes struct {
-	ID       uint            `json:"id"`
-	Customer entity.Customer `json:"customer"`
-	Items    []ItemCount     `json:"items"`
-	Delivery bool            `json:"delivery"`
-	Date     string          `json:"date"`
-	Updated_at string      `json:"updated_at"`
-	Total    int             `json:"total"`
+	ID         uint            `json:"id"`
+	Customer   entity.Customer `json:"customer"`
+	Items      []ItemCount     `json:"items"`
+	Delivery   bool            `json:"delivery"`
+	Date       string          `json:"date"`
+	Updated_at string          `json:"updated_at"`
+	Total      int             `json:"total"`
 }
 
 func (c *Controller) FindAllTicket(ctx *gin.Context) {
@@ -150,7 +150,7 @@ func (c *Controller) FindTicketById(ctx *gin.Context) {
 
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": myTicket	,
+		"data": myTicket,
 	})
 }
 
@@ -281,10 +281,10 @@ func (c *Controller) DeleteTickets(ctx *gin.Context) {
 		return
 	}
 
-	customer, findCustomerErr := c.R.FindUserById(ticket.CustomerID)
-	if findCustomerErr != nil {
+	customer, err := c.R.FindUserById(ticket.CustomerID)
+	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": findCustomerErr.Error(),
+			"message": err.Error(),
 		})
 		return
 	}
@@ -292,12 +292,18 @@ func (c *Controller) DeleteTickets(ctx *gin.Context) {
 	extractPoint := lib.Convert2Point(ticket.Total)
 	customer.Point = customer.Point - extractPoint
 
-	c.R.UpdateUser(&customer)
+	err = c.R.UpdateUser(&customer)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
 
-	deleting := c.R.DeleteTicket(id)
-	if deleting != nil {
+	err = c.R.DeleteTicket(&ticket)
+	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": deleting.Error(),
+			"message": err.Error(),
 		})
 		return
 	}

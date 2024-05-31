@@ -32,7 +32,7 @@ func (u *Repository) CreateUser(creatUserDto *entity.Customer) error {
 	return nil
 }
 
-func (u *Repository) UpdateUser(updateUserDto *entity.Customer) {
+func (u *Repository) UpdateUser(updateUserDto *entity.Customer) error {
 	var updateUser = entity.Customer{
 		Name:         updateUserDto.Name,
 		Email:        updateUserDto.Email,
@@ -43,7 +43,11 @@ func (u *Repository) UpdateUser(updateUserDto *entity.Customer) {
 		Address:      updateUserDto.Address,
 		Point:        updateUserDto.Point,
 	}
-	u.DB.Model(updateUserDto).Updates(updateUser)
+	err := u.DB.Model(updateUserDto).Updates(updateUser)
+	if err!= nil {
+		return err.Error
+	}
+	return nil
 }
 
 func (u *Repository) DeleteUser(id int) error {

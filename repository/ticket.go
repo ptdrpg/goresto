@@ -19,7 +19,7 @@ func (r *Repository) GetAllItemCount() ([]entity.ItemCount, error) {
 	var count []entity.ItemCount
 	if err := r.DB.Model(&entity.ItemCount{}).Find(&count).Error; err != nil {
 		return []entity.ItemCount{}, nil
-	} 
+	}
 
 	return count, nil
 }
@@ -49,28 +49,19 @@ func (r *Repository) UpdateTicket(ticket *entity.Ticket) error {
 	return nil
 }
 
-func (r *Repository) DeleteTicket(id int) error {
-	var ticket entity.Ticket
-	r.DB.Where("id = ?", id).First(&ticket)
+func (r *Repository) DeleteTicket(ticket *entity.Ticket) error {
+	// var ticket entity.Ticket
+	// r.DB.Where("id = ?", id).First(&ticket)
 
 	var itemCount entity.ItemCount
-	deleteItemCount := r.DB.Where("ticket_id = ?", id).Delete(&itemCount)
-	if deleteItemCount != nil {
-		return deleteItemCount.Error
+	if err := r.DB.Where("ticket_id = ?", ticket.ID).Delete(&itemCount).Error; err != nil {
+		return err
 	}
-	
-	if err := r.DB.Where("id = ?", id).Delete(&ticket).Error; err != nil {
+
+	// err := r.DB.Raw("DELETE FROM tickets WHERE id = ?", id)
+	if err := r.DB.Delete(ticket).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
-
-// func (r *Repository) DeleteItemCount(id int) error {
-// 	var user entity.ItemCount
-// 	if err := r.DB.Where("id = ?", id).Delete(&user).Error; err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
