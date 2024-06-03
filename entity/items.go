@@ -7,5 +7,5 @@ type Item struct {
 	Price      int         `json:"price"`
 	Category   string      `json:"category"`
 	ItemCounts []ItemCount `json:"-"`
-	Picture    []byte      `json:"picture"`
+	Picture    string     `json:"picture"`
 }

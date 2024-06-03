@@ -1,9 +1,11 @@
 package controller
 
 import (
-	"bytes"
-	"image/png"
+	"crypto/sha1"
+	"encoding/hex"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -155,31 +157,21 @@ func (c *Controller) UploadImage(ctx *gin.Context) {
 		})
 		return
 	}
+	hash := sha1.New()
+	hashInBytes := hash.Sum([]byte(picture.Filename))
+	hashString := hex.EncodeToString(hashInBytes)
+	outputFileName := hashString + "_" + picture.Filename
+	ctx.SaveUploadedFile(picture, fmt.Sprintf("image/%s", outputFileName))
 
-	file, fileErr := picture.Open()
-	if fileErr != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": fileErr.Error(),
-		})
-		return
-	}
-	defer file.Close()
-
-	img, imgerr := png.Decode(file)
-	if imgerr != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": imgerr.Error(),
-		})
-		return
-	}
-
-	buffer := new(bytes.Buffer)
-	bufferErr := png.Encode(buffer, img)
-	if bufferErr != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": bufferErr.Error(),
-		})
-		return
+	outputDir := "./image/"
+	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
+		err := os.Mkdir(outputDir, os.ModePerm)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 
 	itemID := ctx.Param("id")
@@ -199,7 +191,7 @@ func (c *Controller) UploadImage(ctx *gin.Context) {
 		return
 	}
 
-	item.Picture = buffer.Bytes()
+	item.Picture = fmt.Sprintf("image/%s", outputFileName)
 	updateItem := c.R.UpdateItems(&item)
 	if updateItem != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
