@@ -50,7 +50,8 @@ func (r *Router) RegisterRouter() {
 	ib.POST("/create", r.C.CreateItems)
 	ib.PATCH("/update/:id", r.C.UpdateItems)
 	ib.DELETE("/delete/:id", r.C.DeleteItems)
-	ib.POST("/upload-image/:id", r.C.UploadImage)
+	ib.POST("/upload-picture/:id", r.C.UploadImage)
+	ib.GET("/get-picture/:id", r.C.GetPicture)
 
 	tb := v1.Group("/ticket")
 	tb.GET("/get-all", r.C.FindAllTicket)

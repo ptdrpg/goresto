@@ -205,3 +205,25 @@ func (c *Controller) UploadImage(ctx *gin.Context) {
 		"data": item,
 	})
 }
+
+func (c *Controller) GetPicture (ctx *gin.Context) {
+	itemID := ctx.Param("id")
+	id, _:= strconv.Atoi(itemID)
+	item, err:= c.R.FindItemById(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	path := item.Picture
+	if _, err = os.Stat(path); os.IsNotExist(err) {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "picture not found",
+		})
+		return
+	}
+
+	ctx.File(path)
+}
