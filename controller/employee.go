@@ -220,7 +220,7 @@ func (c *Controller) UploadAvatar(ctx *gin.Context) {
 	id, convErr := strconv.Atoi(employeeId)
 	if convErr != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
+			"message": "error fa tsy aiko fa violet de tsy tiako",
 		})
 		return
 	}
