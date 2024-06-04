@@ -327,3 +327,51 @@ func (c *Controller) UpdatePassword(ctx *gin.Context) {
 	})
 
 }
+
+func (c *Controller) UploadStaffAvatar(ctx *gin.Context) {
+	satffID := ctx.Param("id")
+	id, convErr := strconv.Atoi(satffID)
+	if convErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": convErr.Error(),
+		})
+		return
+	}
+
+	avatar, err := ctx.FormFile("picture")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	path, pathErr := lib.CreateImage(avatar, ctx)
+	if pathErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": pathErr.Error(),
+		})
+		return
+	}
+
+	staff, findStaffErr := c.R.FindStaffById(id)
+	if findStaffErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": findStaffErr.Error(),
+		})
+		return
+	}
+
+	staff.Avatar = path
+	updateErr := c.R.UpdateStaff(&staff)
+	if updateErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": updateErr.Error(),
+		})
+		return
+	}
+
+	ctx.Header("content-Type", "application/json")
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": staff,
+	})
+}

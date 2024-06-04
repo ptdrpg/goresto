@@ -20,6 +20,8 @@ func NewRouter(r *gin.Engine, c *controller.Controller) *Router {
 func (r *Router) RegisterRouter() {
 	apiR := r.R.Group("/api")
 	v1 := apiR.Group("/v1")
+	
+	r.R.Static("/upload", "./image")
 
 	ub := v1.Group("/customer")
 	ub.GET("", r.C.FindAllUsers)
@@ -36,6 +38,7 @@ func (r *Router) RegisterRouter() {
 	sb.DELETE("/delete/:id", r.C.DeleteStaff)
 	sb.PUT("/update-pass/:id", r.C.UpdatePassword)
 	sb.POST("/login", r.C.Login)
+	sb.POST("/upload-avatar/:id", r.C.UploadStaffAvatar)
 
 	eb := v1.Group("/employee")
 	eb.GET("/get-all", r.C.FindAllEmployee)
@@ -52,7 +55,6 @@ func (r *Router) RegisterRouter() {
 	ib.PATCH("/update/:id", r.C.UpdateItems)
 	ib.DELETE("/delete/:id", r.C.DeleteItems)
 	ib.POST("/upload-picture/:id", r.C.UploadImage)
-	r.R.Static("/upload", "./image")
 
 	tb := v1.Group("/ticket")
 	tb.GET("/get-all", r.C.FindAllTicket)
