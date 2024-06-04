@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ptdrpg/resto/entity"
@@ -85,14 +86,6 @@ func (c *Controller) CreateEmployee(ctx *gin.Context) {
 		return
 	}
 
-	err = c.R.UpdateEmployee(&employe)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
 	findCustomer, findCustErr := c.R.FindUserById(employe.CustomerID)
 	if findCustErr != nil || findCustomer.ID < 1 {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -101,16 +94,21 @@ func (c *Controller) CreateEmployee(ctx *gin.Context) {
 		return
 	}
 
-	var response EmployeeRes
-	response.ID = employe.ID
-	response.Customer = findCustomer
-	response.Hire_date = employe.Hire_date
-	response.Job = employe.Job
+	newDate := time.Now()
+	employe.Hire_date = newDate.String()
+
+	createErr := c.R.CreateEmployee(&employe)
+	if createErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": createErr.Error(),
+		})
+		return
+	}
 
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusCreated, gin.H{
 		"message": "employee created",
-		"data":    response,
+		"data":    employe,
 	})
 }
 

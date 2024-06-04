@@ -43,6 +43,7 @@ func (r *Router) RegisterRouter() {
 	eb.POST("/create", r.C.CreateEmployee)
 	eb.PATCH("/update/:id", r.C.UpdateEmployee)
 	eb.DELETE("/delete/:id", r.C.DeleteEmployee)
+	eb.POST("/upload-avatar/:id", r.C.UploadAvatar)
 
 	ib := v1.Group("/items")
 	ib.GET("/get-all", r.C.FindAllItems)
