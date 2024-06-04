@@ -52,7 +52,7 @@ func (c *Controller) CreateItems(ctx *gin.Context) {
 	var item entity.Item
 	err := ctx.ShouldBindJSON(&item)
 	if err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
 		return
