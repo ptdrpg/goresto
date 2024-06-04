@@ -1,15 +1,12 @@
 package controller
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
-	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ptdrpg/resto/entity"
+	"github.com/ptdrpg/resto/lib"
 )
 
 func (c *Controller) FindAllItems(ctx *gin.Context) {
@@ -157,21 +154,13 @@ func (c *Controller) UploadImage(ctx *gin.Context) {
 		})
 		return
 	}
-	hash := sha1.New()
-	hashInBytes := hash.Sum([]byte(picture.Filename))
-	hashString := hex.EncodeToString(hashInBytes)
-	outputFileName := hashString + "_" + picture.Filename
-	ctx.SaveUploadedFile(picture, fmt.Sprintf("image/%s", outputFileName))
 
-	outputDir := "./image/"
-	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
-		err := os.Mkdir(outputDir, os.ModePerm)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
+	path, imgErr := lib.CreateImage(picture, ctx)
+	if imgErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": imgErr.Error(),
+		})
+		return
 	}
 
 	itemID := ctx.Param("id")
@@ -191,7 +180,7 @@ func (c *Controller) UploadImage(ctx *gin.Context) {
 		return
 	}
 
-	item.Picture = fmt.Sprintf("image/%s", outputFileName)
+	item.Picture = path
 	updateItem := c.R.UpdateItems(&item)
 	if updateItem != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -204,26 +193,4 @@ func (c *Controller) UploadImage(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": item,
 	})
-}
-
-func (c *Controller) GetPicture (ctx *gin.Context) {
-	itemID := ctx.Param("id")
-	id, _:= strconv.Atoi(itemID)
-	item, err:= c.R.FindItemById(id)
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	path := item.Picture
-	if _, err = os.Stat(path); os.IsNotExist(err) {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "picture not found",
-		})
-		return
-	}
-
-	ctx.File(path)
 }

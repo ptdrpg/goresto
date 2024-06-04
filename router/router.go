@@ -51,7 +51,7 @@ func (r *Router) RegisterRouter() {
 	ib.PATCH("/update/:id", r.C.UpdateItems)
 	ib.DELETE("/delete/:id", r.C.DeleteItems)
 	ib.POST("/upload-picture/:id", r.C.UploadImage)
-	ib.GET("/get-picture/:id", r.C.GetPicture)
+	r.R.Static("/upload", "./image")
 
 	tb := v1.Group("/ticket")
 	tb.GET("/get-all", r.C.FindAllTicket)

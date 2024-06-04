@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ptdrpg/resto/entity"
+	"github.com/ptdrpg/resto/lib"
 )
 
 type EmployeeRes struct {
@@ -198,4 +199,53 @@ func (c *Controller) DeleteEmployee(ctx *gin.Context) {
 		"message": "employee succefuly deleted",
 	})
 
+}
+
+func (c *Controller) UploadAvatar(ctx *gin.Context) {
+	avatar, err := ctx.FormFile("avatar")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	path, imgErr := lib.CreateImage(avatar, ctx)
+	if imgErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": imgErr.Error(),
+		})
+		return
+	}
+
+	employeeId := ctx.Param("id")
+	id, convErr := strconv.Atoi(employeeId)
+	if convErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	employee, findErr := c.R.FindEmployeeById(id)
+	if findErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "employee not found",
+		})
+		return
+	}
+
+	employee.Avatar = path
+	updateErr := c.R.UpdateEmployee(&employee)
+	if updateErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": updateErr.Error(),
+		})
+		return
+	}
+
+	ctx.Header("content-Type", "application/json")
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": employee,
+	})
 }
