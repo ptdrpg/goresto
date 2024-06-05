@@ -42,30 +42,30 @@ func (c *Controller) CreateEntreprise(ctx *gin.Context) {
 		return
 	}
 
-	staff, findStaffErr := c.R.FindStaffById(int(entreprise.AdminID))
-	if findStaffErr != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": findStaffErr,
-		})
-		return
-	}
+	// staff, findStaffErr := c.R.FindStaffById(int(entreprise.AdminID))
+	// if findStaffErr != nil {
+	// 	ctx.JSON(http.StatusNotFound, gin.H{
+	// 		"message": findStaffErr,
+	// 	})
+	// 	return
+	// }
 
-	createErr := c.R.CreateEntreprise(&entreprise)
-	if createErr != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": createErr.Error(),
-		})
-		return
-	}
+	// createErr := c.R.CreateEntreprise(&entreprise)
+	// if createErr != nil {
+	// 	ctx.JSON(http.StatusBadRequest, gin.H{
+	// 		"message": createErr.Error(),
+	// 	})
+	// 	return
+	// }
 
-	staff.EntrepriseID = int(entreprise.ID)
-	updateStaff := c.R.UpdateStaff(&staff)
-	if updateStaff != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": updateStaff.Error(),
-		})
-		return
-	}
+	// staff.EntrepriseID = int(entreprise.ID)
+	// updateStaff := c.R.UpdateStaff(&staff)
+	// if updateStaff != nil {
+	// 	ctx.JSON(http.StatusBadRequest, gin.H{
+	// 		"message": updateStaff.Error(),
+	// 	})
+	// 	return
+	// }
 
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusCreated, gin.H{

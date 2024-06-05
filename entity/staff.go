@@ -6,6 +6,5 @@ type Staff struct {
 	Username     string `json:"username"`
 	Password     string `json:"password"`
 	Avatar       string `json:"avatar"`
-	EntrepriseID int    `json:"-"`
 	Role         string `json:"role"`
 }

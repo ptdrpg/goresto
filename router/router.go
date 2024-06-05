@@ -20,12 +20,12 @@ func NewRouter(r *gin.Engine, c *controller.Controller) *Router {
 func (r *Router) RegisterRouter() {
 	apiR := r.R.Group("/api")
 	v1 := apiR.Group("/v1")
+	v1.Use(r.C.AuthMiddleware())
 	
 	r.R.Static("/upload", "./image")
 
-	v1.POST("/login", r.C.Login)
+	apiR.POST("/login", r.C.Login)
 	ub := v1.Group("/customer")
-	ub.Use(r.C.AuthMiddleware())
 	ub.GET("", r.C.FindAllUsers)
 	ub.GET("/:id", r.C.FindUserById)
 	ub.POST("/create", r.C.CreateUser)

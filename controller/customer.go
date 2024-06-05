@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,7 +12,6 @@ import (
 
 func (c *Controller) FindAllUsers(ctx *gin.Context) {
 	users, err := c.R.FindAllUsers()
-	var staff entity.Staff
 	username, exist := ctx.Get("username")
 	if !exist {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -20,16 +20,11 @@ func (c *Controller) FindAllUsers(ctx *gin.Context) {
 		return
 	}
 
-	if findStaffErr := c.DB.Where("username = ?", username).First(&staff).Error; findStaffErr != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": findStaffErr.Error(),
-		})
-		return
-	}
-
-	if staff.Role != "admin" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"message": "you'r not autorized to do this action",
+	stringUsername := fmt.Sprintf("%v", username)
+	findStaff := c.R.VerifToken(stringUsername)
+	if findStaff != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": findStaff.Error(),
 		})
 		return
 	}

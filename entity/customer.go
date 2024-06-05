@@ -9,4 +9,5 @@ type Customer struct {
 	Age          string `json:"age"`
 	Gender       string `json:"gender"`
 	Point        int    `json:"point"`
+	EntrepriseID int    `json:"-"`
 }
