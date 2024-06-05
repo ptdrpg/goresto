@@ -23,7 +23,9 @@ func (r *Router) RegisterRouter() {
 	
 	r.R.Static("/upload", "./image")
 
+	v1.POST("/login", r.C.Login)
 	ub := v1.Group("/customer")
+	ub.Use(r.C.AuthMiddleware())
 	ub.GET("", r.C.FindAllUsers)
 	ub.GET("/:id", r.C.FindUserById)
 	ub.POST("/create", r.C.CreateUser)
@@ -37,7 +39,6 @@ func (r *Router) RegisterRouter() {
 	sb.PUT("/update/:id", r.C.UpdateStaff)
 	sb.DELETE("/delete/:id", r.C.DeleteStaff)
 	sb.PUT("/update-pass/:id", r.C.UpdatePassword)
-	sb.POST("/login", r.C.Login)
 	sb.POST("/upload-avatar/:id", r.C.UploadStaffAvatar)
 
 	eb := v1.Group("/employee")

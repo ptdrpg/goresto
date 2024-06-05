@@ -157,7 +157,7 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 		return
 	}
 
-	generateRefreshToken, genRefreshError := lib.GenerateRefreshToken(input.Username)
+	generateRefreshToken, genRefreshError := lib.GenerateRefreshToken(generateToken)
 	if genRefreshError != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": genRefreshError.Error(),

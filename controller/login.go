@@ -81,7 +81,7 @@ func (c *Controller) Login(ctx *gin.Context) {
 		return
 	}
 
-	genRefresh, GenRefreshErr := lib.GenerateRefreshToken(generatetoken)
+	genRefresh, GenRefreshErr := lib.GenerateRefreshToken(staff[0].Username)
 	if GenRefreshErr != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": GenRefreshErr.Error(),

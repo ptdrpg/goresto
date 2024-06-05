@@ -11,6 +11,28 @@ import (
 
 func (c *Controller) FindAllUsers(ctx *gin.Context) {
 	users, err := c.R.FindAllUsers()
+	var staff entity.Staff
+	username, exist := ctx.Get("username")
+	if !exist {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't get username",
+		})
+		return
+	}
+
+	if findStaffErr := c.DB.Where("username = ?", username).First(&staff).Error; findStaffErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": findStaffErr.Error(),
+		})
+		return
+	}
+
+	if staff.Role != "admin" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "you'r not autorized to do this action",
+		})
+		return
+	}
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -28,6 +50,28 @@ func (c *Controller) FindAllUsers(ctx *gin.Context) {
 func (c *Controller) FindUserById(ctx *gin.Context) {
 	customerId := ctx.Param("id")
 	id, err := strconv.Atoi(customerId)
+	var staff entity.Staff
+	username, exist := ctx.Get("username")
+	if !exist {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't get username",
+		})
+		return
+	}
+
+	if findStaffErr := c.DB.Where("username = ?", username).First(&staff).Error; findStaffErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": findStaffErr.Error(),
+		})
+		return
+	}
+
+	if staff.Role != "admin" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "you'r not autorized to do this action",
+		})
+		return
+	}
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -74,6 +118,28 @@ func (c *Controller) UpdateUser(ctx *gin.Context) {
 	var user entity.Customer
 	findId := ctx.Param("id")
 	userId, errConv := strconv.Atoi(findId)
+	var staff entity.Staff
+	username, exist := ctx.Get("username")
+	if !exist {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't get username",
+		})
+		return
+	}
+
+	if findStaffErr := c.DB.Where("username = ?", username).First(&staff).Error; findStaffErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": findStaffErr.Error(),
+		})
+		return
+	}
+
+	if staff.Role != "admin" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "you'r not autorized to do this action",
+		})
+		return
+	}
 
 	if errConv != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -109,6 +175,28 @@ func (c *Controller) UpdateUser(ctx *gin.Context) {
 func (c *Controller) DeleteUser(ctx *gin.Context) {
 	findId := ctx.Param("id")
 	userId, errConv := strconv.Atoi(findId)
+	var staff entity.Staff
+	username, exist := ctx.Get("username")
+	if !exist {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't get username",
+		})
+		return
+	}
+
+	if findStaffErr := c.DB.Where("username = ?", username).First(&staff).Error; findStaffErr != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": findStaffErr.Error(),
+		})
+		return
+	}
+
+	if staff.Role != "admin" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "you'r not autorized to do this action",
+		})
+		return
+	}
 
 	if errConv != nil {
 		log.Fatal(errConv.Error())
