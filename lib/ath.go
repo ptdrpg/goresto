@@ -9,9 +9,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// var jwtkey = []byte("myfirstrestogo")
-// var refreshkey = []byte("refreshkeyrestogo")
-
 type AccesClaims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims

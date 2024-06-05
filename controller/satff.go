@@ -15,6 +15,7 @@ type StaffResponse struct {
 	Customer entity.Customer `json:"customer"`
 	Username string          `json:"username"`
 	Password string          `json:"password"`
+	Role     string          `json:"role"`
 }
 
 type CreateStaffResponse struct {
@@ -24,6 +25,7 @@ type CreateStaffResponse struct {
 	Password     string          `json:"password"`
 	Token        string          `json:"token"`
 	RefreshToken string          `json:"refresh_token"`
+	Role         string          `json:"role"`
 }
 
 func (c *Controller) FindAllStaff(ctx *gin.Context) {
@@ -101,9 +103,11 @@ func (c *Controller) FindStaffById(ctx *gin.Context) {
 }
 
 type StaffCreateInput struct {
-	CustomerID uint   `json:"customer_id"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
+	CustomerID   uint   `json:"customer_id"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	Role         string `json:"role"`
+	EntrepriseID int    `json:"entreprise_id"`
 }
 
 type StaffUpdateInput struct {
@@ -142,6 +146,7 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 		CustomerID: int(customer.ID),
 		Username:   input.Username,
 		Password:   string(hashedPass),
+		Role:       input.Role,
 	}
 
 	generateToken, genTokErr := lib.GenerateToken(input.Username)
@@ -160,14 +165,6 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 		return
 	}
 
-	var staffRes CreateStaffResponse
-	staffRes.ID = staff.ID
-	staffRes.Username = staff.Username
-	staffRes.Password = staff.Password
-	staffRes.Customer = customer
-	staffRes.Token = generateToken
-	staffRes.RefreshToken = generateRefreshToken
-
 	err = c.R.CreateStaff(&staff)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -175,6 +172,16 @@ func (c *Controller) CreateStaff(ctx *gin.Context) {
 		})
 		return
 	}
+
+	var staffRes CreateStaffResponse
+	staffRes.ID = staff.ID
+	staffRes.Username = staff.Username
+	staffRes.Password = staff.Password
+	staffRes.Customer = customer
+	staffRes.Token = generateToken
+	staffRes.RefreshToken = generateRefreshToken
+	staffRes.Role = staff.Role
+
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusCreated, gin.H{
 		"message": "staff succefuly",
@@ -215,6 +222,7 @@ func (c *Controller) UpdateStaff(ctx *gin.Context) {
 		CustomerID: input.CustomerID,
 		Username:   input.Username,
 		Password:   staffTemp.Password,
+		Role:       staffTemp.Role,
 	}
 	c.R.UpdateStaff(&staff)
 
@@ -230,6 +238,7 @@ func (c *Controller) UpdateStaff(ctx *gin.Context) {
 	staffRes.Customer = findCustomer
 	staffRes.Username = staff.Username
 	staffRes.Password = staff.Password
+	staffRes.Role = staff.Role
 
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusOK, gin.H{
