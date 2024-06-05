@@ -93,8 +93,8 @@ func (c *Controller) Login(ctx *gin.Context) {
 	response.ID = staff[0].ID
 	response.Customer = customer[0]
 	response.Username = staff[0].Username
-	response.Token = "Bearer" + " " + generatetoken
-	response.RefreshToken = "Bearer" + " " + genRefresh
+	response.Token = generatetoken
+	response.RefreshToken = genRefresh
 
 	ctx.Header("content-Type", "application/json")
 	ctx.JSON(http.StatusAccepted, gin.H{
